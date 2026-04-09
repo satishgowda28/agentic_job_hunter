@@ -206,8 +206,8 @@ This is how we improve the system over iterations.**
 ## Current Build Status
 
 - [x] Phase 1 — Project structure and folder setup
-- [x] Phase 2 — Gmail reader (`gmail_reader.py` ready)
-- [ ] Phase 3 — JD Scraper + Screenshot (in progress)
+- [x] Phase 2 — Gmail reader (`gmail_reader.py` reads inbox, extracts body + links)
+- [ ] Phase 3 — JD Scraper (in progress — known issue: HTML body commented out)
 - [ ] Phase 3.5 — Portal Scanner
 - [ ] Phase 4 — Match Scorer
 - [ ] Phase 5 — Resume Tailor (output as PDF, not just markdown)

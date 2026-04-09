@@ -1,6 +1,7 @@
 import base64
 import os
 import pickle
+import re
 from datetime import datetime
 
 from bs4 import BeautifulSoup
@@ -36,21 +37,32 @@ def get_gmail_service():
 
 def get_email_body(email_payload):
     body = ""
+    links = []
     if "parts" in email_payload:
         for part in email_payload["parts"]:
+            print(f"-=-=-=-=-={part["mimeType"]}=-=-=-=-=-")
             if part["mimeType"] == "text/plain":
                 data = part["body"].get("data", "")
                 body = base64.urlsafe_b64decode(data).decode("utf-8")
+                url_pattern = r'https?://[^\s<>"]+|www\.[^\s<>"]+'
+                allLiks = re.findall(url_pattern, body)
+                for link in allLiks:
+                    links.append(link)
             elif part["mimeType"] == "text/html":
                 data = part["body"].get("data", "")
                 html = base64.urlsafe_b64decode(data).decode("utf-8")
-                body = BeautifulSoup(html, "html.parser").get_text()
+                parsedHtml = BeautifulSoup(html, "html.parser")
+                # body = parsedHtml.get_text()
+                allLiks = parsedHtml.find_all("a", href=True)
+                for link in allLiks:
+                    links.append(link.get("href"))
+
     else:
         data = email_payload["body"].get("data", "")
         if data:
             body = base64.urlsafe_b64decode(data).decode("utf-8")
 
-    return body.strip()
+    return body.strip(), links
 
 
 def read_job_emails():
@@ -61,9 +73,9 @@ def read_job_emails():
         .messages()
         .list(
             userId="me",
-            # labelIds=["INBOX"],
+            labelIds=["INBOX"],
             # q=f"label:jobs_agents after:{today}",
-            q=f"from:onlyfrontendjobs@substack.com",
+            q=f"from:jobalerts-noreply@linkedin.com after:{today}",
         )
         .execute()
     )
@@ -75,7 +87,7 @@ def read_job_emails():
         txt = service.users().messages().get(userId="me", id=msg["id"]).execute()
 
         headers = txt["payload"]["headers"]
-        body = get_email_body(txt["payload"])
+        body, links = get_email_body(txt["payload"])
         subject = next(
             (h["value"] for h in headers if h["name"] == "Subject"), "No Subject"
         )
@@ -83,7 +95,9 @@ def read_job_emails():
         print("=-=-=-=-=")
         print(f"\nFrom: {sender}")
         print(f"Subject: {subject}")
-        print(f"body: {body}")
+        print(f"links:")
+        for link in links:
+            print(f"\n${link}")
         # if creds and creds.expire
 
 
