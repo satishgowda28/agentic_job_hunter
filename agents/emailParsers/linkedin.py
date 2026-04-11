@@ -26,7 +26,6 @@ class LinkedInParser(BaseJobParser):
         for link in raw_links:
             link = unquote(link)
             if LINKEDIN_STR in link:
-                link = unquote(link)
                 parsed = urlparse(link)
                 components = (parsed.scheme, parsed.netloc, parsed.path, "", "", "")
                 linksList.add(urlunparse(components))

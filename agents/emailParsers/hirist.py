@@ -17,7 +17,7 @@ class ParsedSubject(TypedDict):
 
 class EmailClassification(Enum):
     HIRIST_DIGEST = "hirist_digest"
-    HIRIST_SIGNLE = "hirist_single"
+    HIRIST_SINGLE = "hirist_single"
     LINKEDIN_ALERT = "linkedin_alert"
 
 
@@ -26,7 +26,6 @@ HIRIST_DIGEST_SUBJECT = [
     "Top IT/Tech",
     "Matching Jobs",
     "Top Matching Jobs",
-    "Matching Jobs",
     "10+",
 ]
 
@@ -60,8 +59,9 @@ class HiristParser(BaseJobParser):
         for subTxt in HIRIST_DIGEST_SUBJECT:
             if subTxt in email_subject:
                 return EmailClassification.HIRIST_DIGEST.value
-        return EmailClassification.HIRIST_SIGNLE.value
+        return EmailClassification.HIRIST_SINGLE.value
 
+    # TODO: - Line 66 — split("-") is fragile: a subject like Acme Corp - Senior Engineer - (5-8 yrs) splits into 3 parts and you only look at [1]. Consider split("-", 1) or regex on the whole subject.
     def _parse_subject(self, email_subject) -> ParsedSubject:
         splt_subject_text = email_subject.split("-")
         pattern = r"^(.*?)\s*\(\s*(\d+\s*-\s*\d+\s*(?:yrs?|years?))\s*\)"

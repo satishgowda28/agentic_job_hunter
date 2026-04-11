@@ -1,0 +1,6 @@
+2026-04-11 14:13:00,733 - INFO - file_cache is only supported with oauth2client<4.0.0
+2026-04-11 14:13:00,736 - DEBUG - URL being requested: GET https://gmail.googleapis.com/gmail/v1/users/me/messages?labelIds=INBOX&q=label%3Ajobs_agents+after%3A2026%2F04%2F11&alt=json
+2026-04-11 14:13:01,640 - DEBUG - URL being requested: GET https://gmail.googleapis.com/gmail/v1/users/me/messages/19d7b1fe5c8c97ed?alt=json
+2026-04-11 14:13:02,867 - DEBUG - URL being requested: GET https://gmail.googleapis.com/gmail/v1/users/me/messages/19d7afa35bf41af0?alt=json
+2026-04-11 14:13:03,642 - DEBUG - URL being requested: GET https://gmail.googleapis.com/gmail/v1/users/me/messages/19d7a8c3c777eeec?alt=json
+2026-04-11 14:13:04,464 - DEBUG - URL being requested: GET https://gmail.googleapis.com/gmail/v1/users/me/messages/19d7a5c3d8d7e564?alt=json

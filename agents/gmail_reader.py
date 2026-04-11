@@ -1,59 +1,28 @@
 import base64
-import math
+import logging
 import os
 import pickle
 import re
-from ast import Pass
-from dataclasses import dataclass
 from datetime import datetime
 from email.utils import parseaddr
-from enum import Enum
-from urllib.parse import unquote, urlparse, urlunparse
 
 from bs4 import BeautifulSoup
 from emailParsers import get_parser
 from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
+
+# from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
 SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
 TOKEN_FILE = "token.pickle"
 
-
-@dataclass
-class JobInfo:
-    source: str  # "hirist_single", "hirist_digest", "linkedin_alert"
-    url: str
-    subject: str = ""
-    company: str = ""
-    role: str = ""
-    experience: str = ""
-
-
-class EmailAddr(Enum):
-    HIRIST = "info@hirist.tech"
-    LINKEDIND = "jobalerts-noreply@linkedin.com"
-
-
-# "hirist_single", "hirist_digest", "linkedin_alert", or "unknown"
-class EmailClassification(Enum):
-    HIRIST_DIGEST = "hirist_digest"
-    HIRIST_SIGNLE = "hirist_single"
-    LINKEDIN_ALERT = "linkedin_alert"
-
-
-HIRIST_DIGEST_SUBJECT = [
-    "Top Tech",
-    "Top IT/Tech",
-    "Matching Jobs",
-    "Top Matching Jobs",
-    "Matching Jobs",
-    "10+",
-]
-
-HIRIST_STR = "https://www.hirist.tech/j/"
-LINKEDIN_STR = "https://www.linkedin.com/comm/jobs/view/"
+logging.basicConfig(
+    filename="app.log",
+    filemode="a",
+    level=logging.DEBUG,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
 
 
 def get_gmail_service():
@@ -129,7 +98,7 @@ def read_job_emails():
     messages = results.get("messages", [])
     print(f"Found {len(messages)} emails in Jobs label")
 
-    for msg in messages:  # first 5 only for now
+    for msg in messages:
         txt = service.users().messages().get(userId="me", id=msg["id"]).execute()
 
         headers = txt["payload"]["headers"]
@@ -140,20 +109,22 @@ def read_job_emails():
         sender = next((h["value"] for h in headers if h["name"] == "From"), "Unknown")
         sender_name, email = parseaddr(sender)
         parser = get_parser(email)
-        with open("email_bodt.txt", "a") as bodyTxt:
-            bodyTxt.write("\n=-=-=-=-=")
-            bodyTxt.write(f"\nFrom: {sender}")
-            bodyTxt.write(f"\nSubject: {subject}")
-        if parser:
-            body, raw_links = get_email_body(txt["payload"])
-            # parse_job(self, subject: str, body: str, raw_links: list[str])
-            extracted_jobs = parser.parse_job(subject, body, raw_links)
-            for job in extracted_jobs:
-                if job is not None:
-                    with open("email_bodt.txt", "a") as txt:
-                        txt.write(
+        with open("email_body.txt", "a") as body_txt:
+            body_txt.write("\n=-=-=-=-=")
+            body_txt.write(f"\nFrom: {sender}")
+            body_txt.write(f"\nSubject: {subject}")
+            if parser:
+                body, raw_links = get_email_body(txt["payload"])
+                # parse_job(self, subject: str, body: str, raw_links: list[str])
+                extracted_jobs = parser.parse_job(subject, body, raw_links)
+                for job in extracted_jobs:
+                    if job is not None:
+                        body_txt.write(
                             f"\nFound Job: {job.role} at {job.company} -> {job.url}"
                         )
+            else:
+                logging.warning(f"parser not for {sender_name} - {email}")
+
     print("DONE :)")
 
 
