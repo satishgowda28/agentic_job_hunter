@@ -11,6 +11,7 @@ from enum import Enum
 from urllib.parse import unquote, urlparse, urlunparse
 
 from bs4 import BeautifulSoup
+from emailParsers import get_parser
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -111,68 +112,6 @@ def get_email_body(email_payload):
     return body.strip(), links
 
 
-def classify_email(email_sender, email_subject):
-    sender_name, email = parseaddr(email_sender)
-    match email:
-        case EmailAddr.HIRIST.value:
-            for subTxt in HIRIST_DIGEST_SUBJECT:
-                if subTxt in email_subject:
-                    return EmailClassification.HIRIST_DIGEST
-            return EmailClassification.HIRIST_SIGNLE
-        case EmailAddr.LINKEDIND.value:
-            return EmailClassification.LINKEDIN_ALERT
-        case _:
-            return "unknown"
-
-
-def decode_hirist_links(raw_links):
-    linksList = []
-    for link in raw_links:
-        link = unquote(link)
-        if HIRIST_STR in link:
-            parsed = urlparse(link)
-            match = re.search(r"(https?://.*)", parsed.path)
-            if match:
-                linksList.append(match.group(1))
-    return linksList
-
-
-def parse_hirist_subject(email_subject):
-    splt_subject_text = email_subject.split("-")
-    pattern = r"^(.*?)\s*\(\s*(\d+\s*-\s*\d+\s*(?:yrs?|years?))\s*\)"
-    if len(splt_subject_text) > 1:
-        company = splt_subject_text[0]
-        match = re.search(pattern, splt_subject_text[1], re.IGNORECASE)
-        if match:
-            job_title = match.group(1)
-            experience = match.group(2)
-            return {
-                "company": company,
-                "job_title": job_title,
-                "experience": experience,
-            }
-        return {"company": company}
-    else:
-        match = re.search(pattern, splt_subject_text[0], re.IGNORECASE)
-        if match:
-            job_title = match.group(1)
-            experience = match.group(2)
-            return {"job_title": job_title, "experience": experience}
-    return None
-
-
-def filter_linkedin_links(raw_links):
-    linksList = []
-    for link in raw_links:
-        link = unquote(link)
-        if LINKEDIN_STR in link:
-            link = unquote(link)
-            parsed = urlparse(link)
-            components = (parsed.scheme, parsed.netloc, parsed.path, "", "", "")
-            linksList.append(urlunparse(components))
-    return linksList
-
-
 def read_job_emails():
     service = get_gmail_service()
     today = datetime.now().strftime("%Y/%m/%d")
@@ -182,9 +121,7 @@ def read_job_emails():
         .list(
             userId="me",
             labelIds=["INBOX"],
-            # q=f"label:jobs_agents",
-            maxResults=10,
-            q=f"from:jobalerts-noreply@linkedin.com",
+            q=f"label:jobs_agents after:{today}",
         )
         .execute()
     )
@@ -197,31 +134,26 @@ def read_job_emails():
 
         headers = txt["payload"]["headers"]
         payload = txt["payload"]
-        body, links = get_email_body(txt["payload"])
         subject = next(
             (h["value"] for h in headers if h["name"] == "Subject"), "No Subject"
         )
         sender = next((h["value"] for h in headers if h["name"] == "From"), "Unknown")
         sender_name, email = parseaddr(sender)
-        with open("email_bodt.txt", "a") as txt:
-            txt.write("\n=-=-=-=-=")
-            txt.write(f"\nFrom: {sender}")
-            txt.write(f"\nSubject: {subject}")
-            # txt.write(f"\nBody: {body}")
-            txt.write(f"\nPAyload:\n")
-            txt.write(f"{payload}\n\n")
-            # for link in links:
-            #     link = unquote(link)
-            #     parsed = urlparse(link)
-            #     components = (parsed.scheme, parsed.netloc, parsed.path, "", "", "")
-            #     txt.write(f"\n${urlunparse(components)}\n\n")
-            #     # if HIRIST_STR in link:
-            #     #     parsed = urlparse(link)
-            #     #     match = re.search(r"(https?://.*)", parsed.path)
-            #     #     if match:
-            #     #         extracted_lnk = match.group(1)
-            #     #         txt.write(f"\n${extracted_lnk}")
-        # if creds and creds.expire
+        parser = get_parser(email)
+        with open("email_bodt.txt", "a") as bodyTxt:
+            bodyTxt.write("\n=-=-=-=-=")
+            bodyTxt.write(f"\nFrom: {sender}")
+            bodyTxt.write(f"\nSubject: {subject}")
+        if parser:
+            body, raw_links = get_email_body(txt["payload"])
+            # parse_job(self, subject: str, body: str, raw_links: list[str])
+            extracted_jobs = parser.parse_job(subject, body, raw_links)
+            for job in extracted_jobs:
+                if job is not None:
+                    with open("email_bodt.txt", "a") as txt:
+                        txt.write(
+                            f"\nFound Job: {job.role} at {job.company} -> {job.url}"
+                        )
     print("DONE :)")
 
 

@@ -21,13 +21,13 @@ class LinkedInParser(BaseJobParser):
     def _parse_subject(self, subject):
         pass
 
-    def _parse_links(self, raw_links):
-        linksList = []
+    def _parse_links(self, raw_links) -> list[str]:
+        linksList = set()
         for link in raw_links:
             link = unquote(link)
             if LINKEDIN_STR in link:
                 link = unquote(link)
                 parsed = urlparse(link)
                 components = (parsed.scheme, parsed.netloc, parsed.path, "", "", "")
-                linksList.append(urlunparse(components))
-        return linksList
+                linksList.add(urlunparse(components))
+        return list(linksList)

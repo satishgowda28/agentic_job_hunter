@@ -53,7 +53,7 @@ class HiristParser(BaseJobParser):
                     experience=job_details["experience"] or "",
                 )
             )
-        return super().parse_job(subject, body, raw_links)
+        return jobs
 
     def _classify_source(self, email_subject) -> str:
         # sender_name, email = parseaddr(email_sender)
@@ -89,13 +89,13 @@ class HiristParser(BaseJobParser):
                 }
         return {"company": None, "job_title": None, "experience": None}
 
-    def _parse_links(self, raw_links):
-        linksList = []
+    def _parse_links(self, raw_links) -> list[str]:
+        linksList = set()
         for link in raw_links:
             link = unquote(link)
             if HIRIST_STR in link:
                 parsed = urlparse(link)
                 match = re.search(r"(https?://.*)", parsed.path)
                 if match:
-                    linksList.append(match.group(1))
-        return linksList
+                    linksList.add(match.group(1))
+        return list(linksList)
