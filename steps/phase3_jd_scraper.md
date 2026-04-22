@@ -105,6 +105,38 @@ Translated their Selenium CDP stealth patterns to Playwright equivalents.
 
 ---
 
+## Current Build Status (2026-04-22)
+
+### Completed
+- [x] `BaseSiteScraper` — abstract base with `_screenshot_fallback()` and `_dataExtractor()`
+- [x] `ScrapedJD` dataclass defined in `base_scraper.py`
+- [x] `LinkedinScraper.extract_jd()` — DOM extraction + "show more" button click + screenshot fallback
+- [x] `LinkedinScraper.is_active()` — checks CTA container
+- [x] `_screenshot_fallback()` — Playwright screenshot → Pillow grayscale/resize → Haiku vision → returns `(data, path)`
+- [x] `_dataExtractor()` — Haiku vision call, returns parsed JSON dict
+- [x] Anti-detection in `jd_scraper.py` — user-agent spoof, webdriver flag hidden, Google warmup, random delay
+- [x] Haiku prompt — extracts `title`, `company`, `location`, `jd_text`, `is_active` as JSON
+
+### Remaining
+- [ ] `jd_scraper.py` — URL dispatcher (if/elif on domain → pick scraper)
+- [ ] `jd_scraper.py` — call `scraper.extract_jd(url, page)` and return result
+- [ ] `jd_scraper.py` — browser lifecycle fix (`with sync_playwright()` context manager)
+- [ ] `hirist.py` — implement `is_active()` and `extract_jd()` (same pattern as LinkedIn)
+- [ ] Test against real LinkedIn `/jobs/view/` URL end-to-end
+- [ ] Test against real Hirist URL
+- [ ] Verify screenshot saves to `output/screenshots/`
+- [ ] Verify Haiku extraction returns valid JSON
+
+### Key Decisions Made
+- Fallback threshold: `len(job_data) < 500` chars triggers screenshot path
+- "Show more" button always clicked before screenshot (expands hidden JD text)
+- `wait_for_timeout(1000)` after button click — JS animation needs time to render
+- `_dataExtractor` is a module-level private function (not a class method) — functional style preference
+- `_screenshot_fallback` returns `(data, path)` tuple — caller unpacks both
+- URL transform (`/comm/` → `/jobs/`) happens at email parser level, not in `LinkedinScraper`
+
+---
+
 ## Open items from Phase 2 cleanup (non-blocking)
 
 - `gmail_reader.py:105` — `payload = txt["payload"]` assigned but unused.
