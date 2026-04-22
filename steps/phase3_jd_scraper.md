@@ -16,7 +16,7 @@ scrape_jd(job: JobInfo) -> ScrapedJD | None
   3. Check "is still active":
        - HTTP status != 200 → inactive
        - Page contains "job no longer available" / "expired" / "position filled" → inactive
-       - Redirected to a listings page → inactive
+       - Redirected to a listings page → inactive 
   4. Try DOM extraction:
        - Grab <title>, meta og:title, main content container
        - Most JD pages wrap content in <main>, <article>, or a known class
@@ -64,6 +64,44 @@ scrape_jd(job: JobInfo) -> ScrapedJD | None
 4. Add screenshot + Pillow processing — verify the output file looks right.
 5. Add Haiku vision call (needs `ANTHROPIC_API_KEY` in `.env`).
 6. Wire into orchestrator.
+
+---
+
+## LinkedIn Scraper — Implementation Steps
+
+### Decision (2026-04-22)
+LinkedIn job alert emails contain `/comm/jobs/view/<id>/` URLs — these redirect to login.
+Transforming to `/jobs/view/<id>/` gives public access without login via Playwright.
+Anti-detection is applied at the browser context level (not per-scraper) so all site scrapers benefit.
+
+### Anti-detection setup (in `jd_scraper.py` when creating browser context)
+```
+1. Spoof user-agent → browser.new_context(user_agent="real Chrome UA string")
+2. Hide webdriver flag → context.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+3. Warm up → visit google.com before hitting LinkedIn (reduces fingerprint suspicion)
+4. Random delay → time.sleep(random.uniform(2, 4)) after page.goto()
+```
+
+### LinkedinScraper.extract_jd() steps
+```
+1. Transform URL: url.replace("/comm/jobs/view/", "/jobs/view/")
+2. page.goto(transformed_url, wait_until="domcontentloaded", timeout=30000)
+3. Random human delay
+4. Check is_active:
+     - page.url redirected away from /jobs/view/ → inactive
+     - page content contains "No longer accepting applications" / "job has expired" → inactive
+5. DOM extraction (LinkedIn public job page selectors):
+     - Title:    h1.top-card-layout__title  OR  h1[class*="job-title"]
+     - Company:  a.topcard__org-name-link  OR  span[class*="company-name"]
+     - Location: span.topcard__flavor--bullet  OR  span[class*="location"]
+     - JD text:  div.show-more-less-html__markup  OR  div[class*="description__text"]
+6. If text length < 500 → screenshot fallback (same as base flow)
+7. Return ScrapedJD
+```
+
+### Source of anti-detection patterns
+Learned from `vertexcover-io/linkedin-spider` (open source, MIT licensed).
+Translated their Selenium CDP stealth patterns to Playwright equivalents.
 
 ---
 

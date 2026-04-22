@@ -220,7 +220,7 @@ This is how we improve the system over iterations.**
 
 ## Decisions Already Made
 
-- LinkedIn URLs — not scraped, pre-filtered from email HTML only
+- LinkedIn URLs — ARE scraped, but `/comm/jobs/view/` must be transformed to `/jobs/view/` first (public page, no login needed). Anti-detection applied via Playwright.
 - City preferences — Mumbai, Pune, Bengaluru, Remote
 - Score threshold — 80% for full pipeline, 60% for manual review flag
 - Resume output — PDF (via Playwright/HTML template), not just markdown
