@@ -8,7 +8,7 @@ from .base_scraper import BaseSiteScraper
 class LinkedinScraper(BaseSiteScraper):
     @property
     def domain(self) -> str:
-        return "linkedin.com"
+        return "www.linkedin.com"
 
     def is_active(self, page: Page) -> bool:
         try:
