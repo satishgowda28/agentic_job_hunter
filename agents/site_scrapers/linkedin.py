@@ -35,7 +35,15 @@ class LinkedinScraper(BaseSiteScraper):
             path = None
             data_from_image = None
             if len(job_data) < 500:
-                page.locator("button.show-more-less-html__button").click()
+                print("clicking the button")
+                page.wait_for_selector(".top-level-modal-container", state="attached")
+                page.evaluate(
+                    "document.querySelector('.top-level-modal-container').style.display = 'none'"
+                )
+                page.wait_for_timeout(100)
+                page.locator(
+                    "button.show-more-less-html__button.show-more-less-html__button--more"
+                ).click()
                 page.wait_for_timeout(1000)
                 data_from_image, path = self._screenshot_fallback(company, page)
                 return ScrapedJD(
@@ -57,5 +65,6 @@ class LinkedinScraper(BaseSiteScraper):
                 screenshot_path=path,
             )
         except Exception as err:
+            print("FAILED extract_jd")
             print(f"{err}")
             return None

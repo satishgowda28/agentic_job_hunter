@@ -1,6 +1,7 @@
 import base64
 import json
 import os
+import re
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
@@ -53,10 +54,10 @@ class BaseSiteScraper(ABC):
         page.screenshot(full_page=True, path=path)
         image = PIL.Image.open(path)
         image = image.convert("L")
-        image.thumbnail((800, 800))
-        image.save(path, format="JPEG", quality=60)
+        # image.thumbnail((800, 800))
+        image.save(path, format="JPEG", quality=20)
         data = self._dataExtractor(path)
-        return (data, path)
+        return ({}, path)
 
     def _dataExtractor(self, path: str):
         with open(path, "rb") as f:
@@ -81,6 +82,8 @@ class BaseSiteScraper(ABC):
                                 "text": """You are an expert data extraction bot. Your task is to analyze the provided image of a job posting and extract the key information into a structured JSON format.
 
                                 Analyze the image and extract the following fields. If a specific piece of information is not mentioned in the image, use `null` for that field. Do not invent or infer information that is not explicitly visible.
+                                
+                                Do not use markdown code fences.
 
                                 Expected JSON Schema:
                                 {
@@ -106,8 +109,14 @@ class BaseSiteScraper(ABC):
             json_data = None
             for block in message.content:
                 if block.type == "text":
-                    json_data = json.loads(block.text)
+                    json_data = self._extract_json(block.text)
             if json_data is not None:
                 return json_data
             else:
                 return {}
+
+    def _extract_json(self, text: str) -> dict:
+        match = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", text)
+        if match:
+            return json.loads(match.group(1))
+        return json.loads(text.strip())
