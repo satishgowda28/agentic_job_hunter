@@ -33,9 +33,8 @@ class LinkedinScraper(BaseSiteScraper):
             ).inner_text()
             job_title = page.locator("h1.top-card-layout__title").inner_text()
             path = None
-            data_from_image = None
             if len(job_data) < 500:
-                print("clicking the button")
+                data_from_image = None
                 page.wait_for_selector(".top-level-modal-container", state="attached")
                 page.evaluate(
                     "document.querySelector('.top-level-modal-container').style.display = 'none'"
