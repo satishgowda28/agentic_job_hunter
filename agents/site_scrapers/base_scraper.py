@@ -45,6 +45,9 @@ class BaseSiteScraper(ABC):
         """Extract job details from the page's DOM."""
         pass
 
+    def _check_liveness(self, page: Page):
+        pass
+
     def _screenshot_fallback(
         self, company: str, page: Page
     ) -> tuple[Dict[str, Any], str]:

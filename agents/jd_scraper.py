@@ -37,7 +37,6 @@ def scrape_jd(url: str):
             scraper = get_scraper(url)
             if scraper is not None:
                 job_scraped = scraper.extract_jd(url, page)
-                print(f"{job_scraped}")
             else:
                 logging.warning(f"Scraper not for {url}")
         except Exception as err:
