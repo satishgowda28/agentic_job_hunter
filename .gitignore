@@ -6,3 +6,7 @@
 
 *.pyc
 /output
+
+/__pycache__
+
+./app.log
