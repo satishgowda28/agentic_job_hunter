@@ -3,7 +3,6 @@ import json
 import os
 import re
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Dict, Optional
 
@@ -12,20 +11,11 @@ from anthropic import Anthropic
 from dotenv import load_dotenv
 from playwright.sync_api import Page
 
+from agents.types import ScrapedJD
+
 load_dotenv()
 
 ai_client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
-
-
-@dataclass
-class ScrapedJD:
-    url: str
-    title: str = ""
-    company: str = ""
-    location: str = ""
-    jd_text: str = ""
-    screenshot_path: Optional[str] = None
-    is_active: bool = True
 
 
 class BaseSiteScraper(ABC):

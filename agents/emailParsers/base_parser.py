@@ -1,16 +1,6 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
-from typing import List
 
-
-@dataclass
-class JobInfo:
-    source: str  # "hirist_single", "hirist_digest", "linkedin_alert"
-    url: str
-    subject: str = ""
-    company: str = ""
-    role: str = ""
-    experience: str = ""
+from agents.types import JobInfo
 
 
 class BaseJobParser(ABC):

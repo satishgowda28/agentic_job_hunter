@@ -4,7 +4,9 @@ from enum import Enum
 from typing import TypedDict
 from urllib.parse import unquote, urlparse
 
-from .base_parser import BaseJobParser, JobInfo
+from agents.types import JobInfo
+
+from .base_parser import BaseJobParser
 
 HIRIST_STR = "https://www.hirist.tech/j/"
 

@@ -1,6 +1,8 @@
 from urllib.parse import unquote, urlparse, urlunparse
 
-from .base_parser import BaseJobParser, JobInfo
+from agents.types import JobInfo
+
+from .base_parser import BaseJobParser
 
 LINKEDIN_STR = "https://www.linkedin.com/comm/jobs/view/"
 

@@ -7,6 +7,7 @@ Borrowed patterns from [career-ops](../career-ops). Visit when each phase is don
 ## Phase 3 — JD Scraper (do these first)
 
 ### 1. Liveness check — port `liveness-core.mjs`
+
 **File to create:** `agents/liveness.py`  
 **Source:** `../career-ops/liveness-core.mjs` — `classifyLiveness()`  
 **What:** Regex patterns classify job posting as `active | expired | uncertain` before scraping.  
@@ -35,6 +36,7 @@ def classify_liveness(status, body_text, controls):
 ---
 
 ### 2. LinkedIn URL transform
+
 **File:** `agents/jd_scraper.py`  
 **Source:** `../career-ops/CLAUDE.md` — Decisions section  
 **What:** `/comm/jobs/view/` → `/jobs/view/` before navigating.
@@ -47,9 +49,11 @@ def normalize_linkedin_url(url):
 ---
 
 ### 3. Scraper fallback chain
+
 **File:** `agents/jd_scraper.py`  
 **Source:** career-ops `modes/oferta.md` + `liveness-core.mjs`  
 **Chain:**
+
 1. Navigate → `classify_liveness()`
 2. Try DOM selector
 3. If blocked/empty → grayscale screenshot (quality=60, max_width=800px)
@@ -61,6 +65,7 @@ def normalize_linkedin_url(url):
 ## Phase 4 — Match Scorer
 
 ### 4. Multi-dimensional scoring
+
 **File:** `agents/match_scorer.py`  
 **Source:** `../career-ops/modes/_shared.md` — Scoring System  
 **What:** Replace flat `%` with 4 axes. Route on individual axes, not just composite.
@@ -80,6 +85,7 @@ def normalize_linkedin_url(url):
 ---
 
 ### 5. Block G legitimacy — pre-Sonnet Haiku call
+
 **File:** `agents/match_scorer.py` (pre-filter step)  
 **Source:** `../career-ops/modes/oferta.md` — Block G  
 **What:** Cheap Haiku call before Sonnet. Returns legitimacy tier.
@@ -104,6 +110,7 @@ If `tier=suspicious` → log as `Filtered`, skip Sonnet entirely.
 ## Phase 5 — Resume Tailor
 
 ### 6. Proof points layer — `article-digest.md` pattern
+
 **File to create:** `resume/proof_points.md`  
 **Source:** `../career-ops/article-digest.md` — structure  
 **What:** Separate file of specific metrics/achievements. Feed into tailor prompt alongside base resume.
@@ -124,6 +131,7 @@ Tailor prompt: base_resume + proof_points → pick what matches JD → insert sp
 ## Config (do anytime)
 
 ### 7. Title filter structure from `portals.example.yml`
+
 **File:** `config/portals.yml`  
 **Source:** `../career-ops/templates/portals.example.yml`  
 **What:** Add `title_filter.positive` / `title_filter.negative` YAML block.

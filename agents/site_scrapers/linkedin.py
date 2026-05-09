@@ -1,6 +1,6 @@
 from playwright.sync_api import Page
 
-from agents.site_scrapers.base_scraper import ScrapedJD
+from agents.types import ScrapedJD
 
 from .base_scraper import BaseSiteScraper
 
