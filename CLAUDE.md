@@ -207,10 +207,10 @@ This is how we improve the system over iterations.**
 
 - [x] Phase 1 — Project structure and folder setup
 - [x] Phase 2 — Gmail reader (`gmail_reader.py` reads inbox, extracts body + links)
-- [ ] Phase 3 — JD Scraper (in progress — known issue: HTML body commented out)
+- [x] Phase 3 — JD Scraper
 - [ ] Phase 3.5 — Portal Scanner
-- [ ] Phase 4 — Match Scorer
-- [ ] Phase 5 — Resume Tailor (output as PDF, not just markdown)
+- [x] Phase 4 — Match Scorer
+- [x] Phase 5 — Resume Tailor (outputs .tex to output/tailored/ — PDF compilation deferred, needs texlive)
 - [ ] Phase 6 — Google Sheets Logger
 - [ ] Phase 7 — Orchestrator + Notifier
 
