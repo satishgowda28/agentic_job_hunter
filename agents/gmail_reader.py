@@ -7,6 +7,7 @@ from datetime import datetime
 from email.utils import parseaddr
 
 from bs4 import BeautifulSoup
+from agents.auth import google_init
 from emailParsers import get_parser
 from google.auth.transport.requests import Request
 
@@ -14,34 +15,12 @@ from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
-SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
-TOKEN_FILE = "token.pickle"
-
 logging.basicConfig(
     filename="app.log",
     filemode="a",
     level=logging.DEBUG,
     format="%(asctime)s - %(levelname)s - %(message)s",
 )
-
-
-def get_gmail_service():
-    creds = None
-    if os.path.exists(TOKEN_FILE):
-        with open(TOKEN_FILE, "rb") as token:
-            creds = pickle.load(token)
-
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                "_creds/credentials.json", SCOPES
-            )
-            creds = flow.run_local_server(port=0)
-        with open(TOKEN_FILE, "wb") as token:
-            pickle.dump(creds, token)
-    return build("gmail", "v1", credentials=creds)
 
 
 def get_email_body(email_payload):
@@ -82,7 +61,8 @@ def get_email_body(email_payload):
 
 
 def read_job_emails():
-    service = get_gmail_service()
+    creds = google_init()
+    service = build("gmail", "v1", credentials=creds)
     today = datetime.now().strftime("%Y/%m/%d")
     results = (
         service.users()
