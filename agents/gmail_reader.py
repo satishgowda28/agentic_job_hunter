@@ -1,7 +1,5 @@
 import base64
 import logging
-import os
-import pickle
 import re
 from datetime import datetime
 from email.utils import parseaddr
@@ -9,10 +7,7 @@ from email.utils import parseaddr
 from bs4 import BeautifulSoup
 from agents.auth import google_init
 from emailParsers import get_parser
-from google.auth.transport.requests import Request
 
-# from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
 logging.basicConfig(
@@ -82,7 +77,7 @@ def read_job_emails():
         txt = service.users().messages().get(userId="me", id=msg["id"]).execute()
 
         headers = txt["payload"]["headers"]
-        payload = txt["payload"]
+        # payload = txt["payload"]
         subject = next(
             (h["value"] for h in headers if h["name"] == "Subject"), "No Subject"
         )
