@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import date
 from enum import Enum
 from typing import Literal, Optional
 
@@ -28,8 +29,10 @@ class ScrapedJD:
 
 class JobStatus(str, Enum):
     SHORTLISTED = "Shortlisted"
-    REVIEWMANUALLY = "Review Manually"
+    REVIEW_MANUALLY = "Review Manually"
     SKIPPED = "Skipped"
+    FILTERED = "Filtered"
+    BLACKLISTED = "Blacklisted"
 
 
 class Legitimacy(BaseModel):
@@ -58,3 +61,20 @@ class JobFitReport(MatchReport):
 class ScoringResult:
     job_fit_report: JobFitReport
     legitimacy_data: Legitimacy
+
+
+@dataclass
+class LogData:
+    date: str
+    company: str
+    role: str
+    jd_url: str
+    status: JobStatus
+    applied: str
+    notes: str
+    score: Optional[str] = None
+    matched_skills: Optional[list[str]] = None
+    gaps: Optional[str] = None
+    screenshot: Optional[str] = None
+    tailored_resume: Optional[str] = None
+    filter_reason: Optional[str] = None

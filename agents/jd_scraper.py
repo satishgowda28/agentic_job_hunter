@@ -21,15 +21,13 @@ def start():
 def scrape_jd(url: str):
     job_scraped = None
     with sync_playwright() as pw:
-        browser = pw.chromium.launch(headless=False)
+        browser = pw.chromium.launch(headless=True)
         context = browser.new_context(user_agent=os.getenv("USER_AGENT"))
-        context.add_init_script(
-            """
+        context.add_init_script("""
                 Object.defineProperty(navigator, 'webdriver', {
                     get: () => undefined
                 })
-            """
-        )
+            """)
         page = context.new_page()
         page.goto("https://google.com")
         time.sleep(random.uniform(2, 4))

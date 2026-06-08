@@ -211,7 +211,7 @@ This is how we improve the system over iterations.**
 - [ ] Phase 3.5 — Portal Scanner
 - [x] Phase 4 — Match Scorer
 - [x] Phase 5 — Resume Tailor (outputs .tex to output/tailored/ — PDF compilation deferred, needs texlive)
-- [ ] Phase 6 — Google Sheets Logger
+- [x] Phase 6 — Google Sheets Logger (`agents/logger.py` — append-only, all statuses)
 - [ ] Phase 7 — Orchestrator + Notifier
 
 **Update this section as phases are completed.**

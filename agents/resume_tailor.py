@@ -1,11 +1,10 @@
 import datetime
+import os
 
 from anthropic import Anthropic
 from dotenv import load_dotenv
 
 from agents.types import ScoringResult, ScrapedJD
-
-import os
 
 load_dotenv()
 
@@ -21,7 +20,7 @@ def tailor_resume(jd: ScrapedJD, scoring_result: ScoringResult):
             base_resume = br.read()
             template = tmpl.read()
             resume_output = ai_client.messages.create(
-                model="claude-sonnet-4-5",
+                model="claude-sonnet-4-6",
                 max_tokens=4096,
                 messages=[
                     {

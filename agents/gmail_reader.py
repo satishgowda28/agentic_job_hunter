@@ -5,10 +5,11 @@ from datetime import datetime
 from email.utils import parseaddr
 
 from bs4 import BeautifulSoup
-from agents.auth import google_init
 from emailParsers import get_parser
-
 from googleapiclient.discovery import build
+
+from agents.auth import google_init
+from agents.types import JobInfo
 
 logging.basicConfig(
     filename="app.log",
@@ -72,7 +73,7 @@ def read_job_emails():
 
     messages = results.get("messages", [])
     print(f"Found {len(messages)} emails in Jobs label")
-
+    jobInfoList = []
     for msg in messages:
         txt = service.users().messages().get(userId="me", id=msg["id"]).execute()
 
@@ -84,21 +85,30 @@ def read_job_emails():
         sender = next((h["value"] for h in headers if h["name"] == "From"), "Unknown")
         sender_name, email = parseaddr(sender)
         parser = get_parser(email)
-        with open("email_body.txt", "a") as body_txt:
-            body_txt.write("\n=-=-=-=-=")
-            body_txt.write(f"\nFrom: {sender}")
-            body_txt.write(f"\nSubject: {subject}")
-            if parser:
-                body, raw_links = get_email_body(txt["payload"])
-                # parse_job(self, subject: str, body: str, raw_links: list[str])
-                extracted_jobs = parser.parse_job(subject, body, raw_links)
-                for job in extracted_jobs:
-                    if job is not None:
-                        body_txt.write(
-                            f"\nFound Job: {job.role} at {job.company} -> {job.url}"
-                        )
-            else:
-                logging.warning(f"parser not for {sender_name} - {email}")
+        if parser:
+            body, raw_links = get_email_body(txt["payload"])
+            # parse_job(self, subject: str, body: str, raw_links: list[str])
+            extracted_jobs = parser.parse_job(subject, body, raw_links)
+            for job in extracted_jobs:
+                if job is not None:
+                    jobInfoList.append(job)
+    return jobInfoList
+
+    # with open("email_body.txt", "a") as body_txt:
+    #     body_txt.write("\n=-=-=-=-=")
+    #     body_txt.write(f"\nFrom: {sender}")
+    #     body_txt.write(f"\nSubject: {subject}")
+    #     if parser:
+    #         body, raw_links = get_email_body(txt["payload"])
+    #         # parse_job(self, subject: str, body: str, raw_links: list[str])
+    #         extracted_jobs = parser.parse_job(subject, body, raw_links)
+    #         for job in extracted_jobs:
+    #             if job is not None:
+    #                 body_txt.write(
+    #                     f"\nFound Job: {job.role} at {job.company} -> {job.url}"
+    #                 )
+    #     else:
+    #         logging.warning(f"parser not for {sender_name} - {email}")
 
     print("DONE :)")
 

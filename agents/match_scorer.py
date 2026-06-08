@@ -1,6 +1,7 @@
 import os
 
 from anthropic import Anthropic
+from dotenv import load_dotenv
 
 from agents.types import (
     JobFitReport,
@@ -10,8 +11,6 @@ from agents.types import (
     ScoringResult,
     ScrapedJD,
 )
-from dotenv import load_dotenv
-
 from utils import parsers
 
 load_dotenv()
@@ -28,17 +27,15 @@ def score_job(jd: ScrapedJD | None) -> ScoringResult | None:
     )
     if job_legitimacy_data is not None:
         if job_legitimacy_data.tier == "suspicious":
+            # logger will come
             return None
-        elif job_legitimacy_data.tier == "caution":
-            print(f"loggin will come here {job_legitimacy_data.reason}")
         else:
-            print("process it with sonnet")
             job_fit_report = job_composite(jd)
             if job_fit_report:
                 return ScoringResult(
                     legitimacy_data=job_legitimacy_data, job_fit_report=job_fit_report
                 )
-    print(job_legitimacy_data)
+    return None
 
 
 def job_posting_analysis(jd: ScrapedJD):
@@ -150,7 +147,8 @@ def job_composite(jd: ScrapedJD) -> JobFitReport | None:
             if score >= 80:
                 status = JobStatus.SHORTLISTED
             elif score >= 60:
-                status = JobStatus.REVIEWMANUALLY
+                status = JobStatus.REVIEW_MANUALLY
+                # logger will come
 
             return JobFitReport(
                 **match_report.model_dump(),
