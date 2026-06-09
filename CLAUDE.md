@@ -238,6 +238,7 @@ This is how we improve the system over iterations.**
 - LinkedIn outreach draft generated per shortlisted job
 - A-F weighted scoring dimensions (v2 of scorer)
 - Cron job scheduling (manual run for now)
+- Async scraping with `async_playwright` — parallelize JD scraping for 50+ jobs
 - Go TUI dashboard (after Flocuz — don't mix projects)
 
 ---

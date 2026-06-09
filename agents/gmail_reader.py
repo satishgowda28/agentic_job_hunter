@@ -56,7 +56,7 @@ def get_email_body(email_payload):
     return body.strip(), links
 
 
-def read_job_emails():
+def read_job_emails() -> list[JobInfo]:
     creds = google_init()
     service = build("gmail", "v1", credentials=creds)
     today = datetime.now().strftime("%Y/%m/%d")

@@ -11,7 +11,7 @@ load_dotenv()
 ai_client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
 
-def tailor_resume(jd: ScrapedJD, scoring_result: ScoringResult):
+def tailor_resume(jd: ScrapedJD, scoring_result: ScoringResult) -> str | None:
     try:
         with (
             open("resumes/base_resume.md", "r", encoding="utf-8") as br,
@@ -92,7 +92,6 @@ def tailor_resume(jd: ScrapedJD, scoring_result: ScoringResult):
                     tex.write(custom_resume)
                     print(f"saved to {jd.company}_{date}.tex")
                 return file_name
-            pass
     except Exception as err:
         # TODO: log will come, when log func is created
         print(err)

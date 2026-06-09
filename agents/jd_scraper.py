@@ -7,6 +7,8 @@ import time
 from dotenv import load_dotenv
 from playwright.sync_api import sync_playwright
 
+from agents.types import ScrapedJD
+
 from .site_scrapers import get_scraper
 
 load_dotenv()
@@ -18,7 +20,7 @@ def start():
         scrape_jd(url)
 
 
-def scrape_jd(url: str):
+def scrape_jd(url: str) -> ScrapedJD | None:
     job_scraped = None
     with sync_playwright() as pw:
         browser = pw.chromium.launch(headless=True)
