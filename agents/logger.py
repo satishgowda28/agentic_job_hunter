@@ -131,6 +131,34 @@ def build_row(
                 notes="Rejected before scraping phase.",
                 filter_reason="Matched blacklisted keyword or failed pre-filter criteria.",
             )
+        case JobStatus.SCRAPE_FAILED:
+            if not job_info:
+                logging.error(f"Missing job_info for {job_status.name} job.")
+                return None
+
+            return LogData(
+                date=today,
+                company=job_info.company,
+                role=job_info.role,
+                jd_url=job_info.url,
+                status=job_status,
+                applied="No",
+                notes="Scraping failed",
+            )
+        case JobStatus.SUSPICIOUS:
+            if not job_info:
+                logging.error(f"Missing job_info for {job_status.name} job.")
+                return None
+
+            return LogData(
+                date=today,
+                company=job_info.company,
+                role=job_info.role,
+                jd_url=job_info.url,
+                status=job_status,
+                applied="No",
+                notes="The Job posting was suspicous",
+            )
 
         # SAFETY NET
         case _:

@@ -33,6 +33,8 @@ class JobStatus(str, Enum):
     SKIPPED = "Skipped"
     FILTERED = "Filtered"
     BLACKLISTED = "Blacklisted"
+    SCRAPE_FAILED = "Scrape Failed"
+    SUSPICIOUS = "Suspicious"
 
 
 class Legitimacy(BaseModel):

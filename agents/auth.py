@@ -1,12 +1,14 @@
 import os
 import pickle
+
+from google.auth.credentials import Credentials
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.credentials import Credentials
 
 SCOPES = [
     "https://www.googleapis.com/auth/gmail.readonly",
     "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/gmail.send",
 ]
 TOKEN_FILE = "token.pickle"
 
