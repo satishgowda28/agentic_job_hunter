@@ -207,14 +207,38 @@ This is how we improve the system over iterations.**
 
 - [x] Phase 1 — Project structure and folder setup
 - [x] Phase 2 — Gmail reader (`gmail_reader.py` reads inbox, extracts body + links)
-- [x] Phase 3 — JD Scraper
+- [x] Phase 3 — JD Scraper (hirist + linkedin, DOM first → screenshot fallback)
 - [ ] Phase 3.5 — Portal Scanner
-- [x] Phase 4 — Match Scorer
-- [x] Phase 5 — Resume Tailor (outputs .tex to output/tailored/ — PDF compilation deferred, needs texlive)
+- [x] Phase 4 — Match Scorer (Haiku legitimacy + Sonnet scoring)
+- [x] Phase 5 — Resume Tailor (outputs .tex to output/tailored/)
 - [x] Phase 6 — Google Sheets Logger (`agents/logger.py` — append-only, all statuses)
-- [ ] Phase 7 — Orchestrator + Notifier
+- [x] Phase 7 — Orchestrator + Notifier (end-to-end pipeline verified 2026-06-24)
 
 **Update this section as phases are completed.**
+
+---
+
+## Pending Items
+
+### Phase 3.5 — Portal Scanner (next up)
+- [ ] Build `agents/portal_scanner.py` — scrape career pages from `config/portals.yml`
+- [ ] Pre-filter results same as LinkedIn alerts (city/seniority/role/blacklist)
+- [ ] Feed into same orchestrator pipeline
+
+### Known Issues / Polish
+- [ ] LinkedIn scraper untested end-to-end in full pipeline (emails with LinkedIn URLs)
+- [ ] `output/screenshots/` filenames ugly when company unknown (`_240626.jpg`) — pass `"unknown"` instead of `""`
+- [ ] Resume `.tex` not compiled to PDF — deferred until texlive available
+- [ ] `import select` unused in `base_scraper.py` — dead import
+
+### Backlog (Post-MVP)
+- [ ] PDF resume output — styled HTML → PDF via Playwright
+- [ ] STAR story bank accumulated per evaluation
+- [ ] LinkedIn outreach draft per shortlisted job
+- [ ] A-F weighted scoring dimensions (v2 scorer)
+- [ ] Cron scheduling — automate daily run
+- [ ] Async scraping with `async_playwright` — parallelize 50+ jobs
+- [ ] Go TUI dashboard (after Flocuz)
 
 ---
 
@@ -228,18 +252,6 @@ This is how we improve the system over iterations.**
 - Dedup — never create duplicate company+role rows, update existing entry
 - Portal scanner — uses `config/portals.yml` for company career page URLs
 - STAR story bank — Phase 8 backlog, not MVP
-
----
-
-## Backlog (Post-MVP)
-
-- PDF resume output with styled HTML template
-- STAR story bank accumulated per evaluation
-- LinkedIn outreach draft generated per shortlisted job
-- A-F weighted scoring dimensions (v2 of scorer)
-- Cron job scheduling (manual run for now)
-- Async scraping with `async_playwright` — parallelize JD scraping for 50+ jobs
-- Go TUI dashboard (after Flocuz — don't mix projects)
 
 ---
 

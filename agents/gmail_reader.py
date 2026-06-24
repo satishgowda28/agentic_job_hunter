@@ -5,10 +5,10 @@ from datetime import datetime
 from email.utils import parseaddr
 
 from bs4 import BeautifulSoup
-from emailParsers import get_parser
 from googleapiclient.discovery import build
 
 from agents.auth import google_init
+from agents.emailParsers import get_parser
 from agents.types import JobInfo
 
 logging.basicConfig(

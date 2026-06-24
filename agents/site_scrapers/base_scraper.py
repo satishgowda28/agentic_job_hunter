@@ -2,7 +2,9 @@ import base64
 import json
 import os
 import re
+import select
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Dict, Optional
 
@@ -16,6 +18,13 @@ from agents.types import ScrapedJD
 load_dotenv()
 
 ai_client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+
+
+@dataclass
+class SelectorRule:
+    selector: str
+    attribute: Optional[str] = None
+    default: str = ""
 
 
 class BaseSiteScraper(ABC):
@@ -50,7 +59,7 @@ class BaseSiteScraper(ABC):
         # image.thumbnail((800, 800))
         image.save(path, format="JPEG", quality=20)
         data = self._dataExtractor(path)
-        return ({}, path)
+        return (data, path)
 
     def _dataExtractor(self, path: str):
         with open(path, "rb") as f:
@@ -113,3 +122,19 @@ class BaseSiteScraper(ABC):
         if match:
             return json.loads(match.group(1))
         return json.loads(text.strip())
+
+    def _extract_generic_data(
+        self, page: Page, config: Dict[str, SelectorRule]
+    ) -> dict:
+        extracted = {}
+        for key, rule in config.items():
+            loc = page.locator(rule.selector)
+            if loc.count() > 0:
+                if rule.attribute:
+                    val = loc.first.get_attribute(rule.attribute)
+                    extracted[key] = val.strip() if val else rule.default
+                else:
+                    extracted[key] = loc.first.inner_text().strip()
+            else:
+                extracted[key] = rule.default
+        return extracted
