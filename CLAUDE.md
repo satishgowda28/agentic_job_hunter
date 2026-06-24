@@ -220,10 +220,18 @@ This is how we improve the system over iterations.**
 
 ## Pending Items
 
+### Build Order (agreed)
+
+1. **Phase 3.5 — Portal Scanner** — ATS APIs (Greenhouse/Ashby/Lever), zero scraping, zero tokens
+2. **FastAPI `POST /scan`** — on-demand scoring from URL or pasted JD text, exposed via ngrok
+3. **Email-yourself parser** — email URL to self → `jobs_agents` label → picked up next run
+4. **LiteLLM** — provider-agnostic AI layer, after prompts are stable
+
 ### Phase 3.5 — Portal Scanner (next up)
-- [ ] Build `agents/portal_scanner.py` — scrape career pages from `config/portals.yml`
+- [ ] Build `agents/portal_scanner.py` — detect ATS from careers URL (Greenhouse/Ashby/Lever), hit JSON API directly
 - [ ] Pre-filter results same as LinkedIn alerts (city/seniority/role/blacklist)
 - [ ] Feed into same orchestrator pipeline
+- [ ] Fall back to Playwright only for custom career sites with no detectable ATS
 
 ### Known Issues / Polish
 - [ ] LinkedIn scraper untested end-to-end in full pipeline (emails with LinkedIn URLs)
@@ -232,6 +240,7 @@ This is how we improve the system over iterations.**
 - [ ] `import select` unused in `base_scraper.py` — dead import
 
 ### Backlog (Post-MVP)
+- [ ] LiteLLM — replace direct Anthropic SDK calls with provider-agnostic wrapper (`utils/ai.py`), switch provider via `.env`
 - [ ] PDF resume output — styled HTML → PDF via Playwright
 - [ ] STAR story bank accumulated per evaluation
 - [ ] LinkedIn outreach draft per shortlisted job
