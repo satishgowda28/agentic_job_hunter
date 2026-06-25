@@ -1,0 +1,12 @@
+companies:
+  - name: Celonis
+    careers_url: https://job-boards.greenhouse.io/celonis
+    api: https://boards-api.greenhouse.io/v1/boards/celonis/jobs
+  - name: Razorpay
+    careers_url: https://job-boards.greenhouse.io/razorpaysoftwareprivatelimited
+  - name: Zepto
+    careers_url: https://zepto.talentrecruit.com/career-page
+  - name: Anthropic
+    careers_url: https://job-boards.greenhouse.io/anthropic
+  - name: Cred
+    careers_url: https://careers.cred.club/openings
