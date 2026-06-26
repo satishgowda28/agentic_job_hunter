@@ -1,5 +1,7 @@
+import logging
 from urllib.parse import urlparse
 
+import requests
 import yaml
 
 from agents.types import Portal, Portals
@@ -40,7 +42,21 @@ def fetch_data(ats: str, portal: Portal):
         slug = urlparse(portal.careers_url).path.strip("/")
         api_url = api_template.replace("{slug}", slug)
         # call api call
+        reponse = handle_get_details(api_url)
+        print(reponse)
     pass
+
+
+def handle_get_details(api_url: str):
+    data = None
+    try:
+        response = requests.get(api_url)
+        response.raise_for_status()
+        data = response.json()
+    except Exception as err:
+        logging.exception(f"failed loading ATS url {api_url}, err: {err}")
+
+    return data
 
 
 if __name__ == "__main__":
