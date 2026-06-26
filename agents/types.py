@@ -80,3 +80,13 @@ class LogData:
     screenshot: Optional[str] = None
     tailored_resume: Optional[str] = None
     filter_reason: Optional[str] = None
+
+
+class Portal(BaseModel):
+    name: str
+    careers_url: str
+    api: Optional[str] = None
+
+
+class Portals(BaseModel):
+    companies: list[Portal]
